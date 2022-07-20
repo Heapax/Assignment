@@ -1,0 +1,61 @@
+---
+
+- hosts: endpoints
+  become: true
+  become_user: root
+  gather_facts: no
+  tasks:
+  - name: system update
+    apt:
+      update_cache: yes
+
+  - name: Installing python
+    apt:
+      name: python3
+
+  - name: Installing pip
+    apt:
+      name: python3-pip
+
+  - name: Installing boto3 lib
+    shell: pip3 install boto3
+
+  - name: Installing Flask lib
+    shell: pip3 install flask
+
+  - name: installing Docker
+    apt:
+      name: docker
+
+  - name: installing Docker compose
+    apt:
+      name: docker-compose
+
+  - name: Copy app.py to host
+    ansible.builtin.copy:
+      src: app.py
+      dest: /home/flaskApp/app.py
+
+  - name: Copy Dockerfile to host
+    ansible.builtin.copy:
+      src: Dockerfile
+      dest: /home/flaskApp/Dockerfile
+
+  - name: Copy docker-compose.yaml to host
+    ansible.builtin.copy:
+      src: docker-compose.yaml
+      dest: /home/flaskApp/docker-compose.yaml
+
+  - name: Copy requirements.txt to host
+    ansible.builtin.copy:
+      src: requiremenets.txt
+      dest: /home/flaskApp/requirements.txt
+
+  - name: Ensure docker deamon is running
+    service:
+      name: docker
+      state: started
+
+  - name: Envoking Docker-compose
+    shell: docker compose up
+...
